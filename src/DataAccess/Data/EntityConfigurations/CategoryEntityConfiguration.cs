@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataAccess.Data.EntityConfigurations;
 
-internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Category>
+internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<CategoryEntity>
 {
-    public void Configure(EntityTypeBuilder<Category> builder)
+    public void Configure(EntityTypeBuilder<CategoryEntity> builder)
     {
         builder.ToTable(name: "Categories");
 

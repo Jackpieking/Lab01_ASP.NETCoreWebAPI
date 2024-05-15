@@ -1,0 +1,38 @@
+﻿@using ProductManagementWebClient.Commons
+@model ProductEntity
+@{
+    var categoryList = ViewData[ViewDataKeys.CategoryList];
+    var isValidToDisplay = categoryList != null;
+}
+
+@if (isValidToDisplay)
+{
+    <form method="post" asp-action="Create">
+        <div class="mb-3">
+            <label asp-for="@Model.ProductName" class="form-label">Product Name</label>
+            <input asp-for="@Model.ProductName" class="form-control" placeholder="Product Name" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="@Model.CategoryId">Product Category</label>
+            <select asp-for="@Model.CategoryId" class="form-select">
+                @foreach (var category in categoryList as IEnumerable<CategoryEntity>)
+                {
+                    <option value="@category.CategoryId">@category.CategoryName</option>
+                }
+            </select>
+        </div>
+        <div class="mb-3">
+            <label asp-for="@Model.UnitPrice" class="form-label">Unit Price</label>
+            <input asp-for="@Model.UnitPrice" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="@Model.UnitsInStock" class="form-label">Unit In Stock</label>
+            <input asp-for="@Model.UnitsInStock" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+}
+else
+{
+    <h1>Failed to connect to the API.</h1>
+}

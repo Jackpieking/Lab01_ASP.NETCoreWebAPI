@@ -1,0 +1,56 @@
+﻿@model IEnumerable<ProductEntity>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create a new Product</a>
+</p>
+@if (Model != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UnitPrice)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var item in Model)
+            {
+                <tr>
+                    <td>
+                        @item.ProductId
+                    </td>
+                    <td>
+                        @item.ProductName
+                    </td>
+                    <td>
+                        @item.UnitPrice
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { Id = item.ProductId }) 
+                        |
+                        @Html.ActionLink("Details", "Details", new { Id = item.ProductId })
+                        |
+                        @Html.ActionLink("Delete", "Delete", new { Id = item.ProductId })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    @("Failed to Connect the API.")
+}

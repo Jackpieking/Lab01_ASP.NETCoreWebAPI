@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataAccess.Data.EntityConfigurations;
 
-internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Product>
+internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<ProductEntity>
 {
-    public void Configure(EntityTypeBuilder<Product> builder)
+    public void Configure(EntityTypeBuilder<ProductEntity> builder)
     {
         builder.ToTable(name: "Products");
 

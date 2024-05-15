@@ -2,11 +2,11 @@
 
 namespace DataAccess.Entities;
 
-public sealed class Category
+public sealed class CategoryEntity
 {
     public int CategoryId { get; set; }
 
     public string CategoryName { get; set; }
 
-    public IEnumerable<Product> Products { get; set; }
+    public IEnumerable<ProductEntity> Products { get; set; }
 }

@@ -57,6 +57,22 @@ public sealed class ProductController : ControllerBase
         );
     }
 
+    [HttpGet("{productId:int}")]
+    public async Task<IActionResult> GetProductByIdAsync(int productId, CancellationToken ct)
+    {
+        var isFound = await _unitOfWork.ProductRepository.IsProductFoundByProductIdAsync(
+            productId: productId, ct: ct);
+
+        if (!isFound)
+        {
+            return NotFound();
+        }
+
+        var foundProduct = await _unitOfWork.ProductRepository.FindProductByIdAsync(productId, ct);
+
+        return Ok(foundProduct);
+    }
+
     /// <summary>
     ///     Create new product.
     /// </summary>
@@ -126,7 +142,7 @@ public sealed class ProductController : ControllerBase
 
         return Ok();
 
-        Product InitNewProduct()
+        ProductEntity InitNewProduct()
         {
             return new()
             {
@@ -250,18 +266,6 @@ public sealed class ProductController : ControllerBase
             return NotFound(value: $"Category with id = {dto.CategoryId} is not found !!");
         }
 
-        // Is product name found by product name.
-        var isProductNameFound =
-            await _unitOfWork.ProductRepository.IsProductFoundByProductNameAsync(
-                productName: dto.ProductName,
-                ct: ct
-            );
-
-        if (isProductNameFound)
-        {
-            return Conflict(error: $"Product with name = {dto.ProductName} already exists !!");
-        }
-
         // Update product.
         var dbResult = await _unitOfWork.ProductRepository.UpdateProductAsync(
             updatedProduct: InitUpdatedProduct(),
@@ -275,7 +279,7 @@ public sealed class ProductController : ControllerBase
 
         return Ok();
 
-        Product InitUpdatedProduct()
+        ProductEntity InitUpdatedProduct()
         {
             return new()
             {

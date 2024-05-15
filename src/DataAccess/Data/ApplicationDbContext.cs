@@ -9,7 +9,7 @@ public sealed class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
 
-    public DbSet<Product> Products { get; set; }
+    public DbSet<ProductEntity> Products { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,10 +22,10 @@ public sealed class ApplicationDbContext : DbContext
 
     private static void DataSeeding(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Category>(category =>
+        modelBuilder.Entity<CategoryEntity>(category =>
         {
             category.HasData(
-                new List<Category>()
+                new List<CategoryEntity>()
                 {
                     new() { CategoryId = 1, CategoryName = "Beverages" },
                     new() { CategoryId = 2, CategoryName = "Condiments" },

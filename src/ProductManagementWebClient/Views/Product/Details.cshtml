@@ -1,0 +1,47 @@
+﻿@model ProductEntity
+@if (Model == null)
+{
+    <h1 class="text-danger">Failed to connect to the API.</h1>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UnitPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UnitsInStock)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    @Model.ProductId
+                </td>
+                <td>
+                    @Model.ProductName
+                </td>
+                <td>
+                    @Model.UnitPrice
+                </td>
+                <td>
+                    @Model.UnitsInStock
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { Id = Model.ProductId })
+                    |
+                    @Html.ActionLink("Delete", "Delete", new { Id = Model.ProductId })
+                </td>
+            </tr>
+        </tbody>
+    </table>
+}

@@ -1,6 +1,6 @@
 ﻿namespace DataAccess.Entities;
 
-public sealed class Product
+public sealed class ProductEntity
 {
     public int ProductId { get; set; }
 
@@ -12,5 +12,5 @@ public sealed class Product
 
     public decimal UnitPrice { get; set; }
 
-    public Category Category { get; set; }
+    public CategoryEntity Category { get; set; }
 }

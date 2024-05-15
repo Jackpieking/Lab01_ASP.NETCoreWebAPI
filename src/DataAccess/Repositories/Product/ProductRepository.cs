@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DataAccess.Data;
+using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Product;
@@ -10,19 +11,19 @@ namespace DataAccess.Repositories.Product;
 public sealed class ProductRepository : IProductRepository
 {
     private readonly ApplicationDbContext _context;
-    private readonly DbSet<Entities.Product> _products;
+    private readonly DbSet<Entities.ProductEntity> _products;
 
     internal ProductRepository(ApplicationDbContext context)
     {
         _context = context;
-        _products = context.Set<Entities.Product>();
+        _products = context.Set<Entities.ProductEntity>();
     }
 
-    public async Task<IEnumerable<Entities.Product>> GetProductsAsync(CancellationToken ct)
+    public async Task<IEnumerable<Entities.ProductEntity>> GetProductsAsync(CancellationToken ct)
     {
         return await _products
             .AsNoTracking()
-            .Select(selector: product => new Entities.Product
+            .Select(selector: product => new Entities.ProductEntity
             {
                 ProductId = product.ProductId,
                 ProductName = product.ProductName,
@@ -33,7 +34,7 @@ public sealed class ProductRepository : IProductRepository
             .ToListAsync(cancellationToken: ct);
     }
 
-    public async Task<bool> CreateProductAsync(Entities.Product newProduct, CancellationToken ct)
+    public async Task<bool> CreateProductAsync(Entities.ProductEntity newProduct, CancellationToken ct)
     {
         try
         {
@@ -97,7 +98,7 @@ public sealed class ProductRepository : IProductRepository
     }
 
     public async Task<bool> UpdateProductAsync(
-        Entities.Product updatedProduct,
+        Entities.ProductEntity updatedProduct,
         CancellationToken ct
     )
     {
@@ -143,5 +144,10 @@ public sealed class ProductRepository : IProductRepository
             });
 
         return dbResult;
+    }
+
+    public Task<ProductEntity> FindProductByIdAsync(int productId, CancellationToken ct)
+    {
+        return _products.FirstOrDefaultAsync(product => product.ProductId == productId, ct);
     }
 }
