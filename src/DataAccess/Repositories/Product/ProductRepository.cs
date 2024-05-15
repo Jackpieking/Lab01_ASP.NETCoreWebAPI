@@ -32,4 +32,67 @@ public sealed class ProductRepository : IProductRepository
             })
             .ToListAsync(cancellationToken: ct);
     }
+
+    public async Task<bool> CreateProductAsync(Entities.Product newProduct, CancellationToken ct)
+    {
+        try
+        {
+            await _products.AddAsync(entity: newProduct, cancellationToken: ct);
+
+            await _context.SaveChangesAsync(cancellationToken: ct);
+        }
+        catch
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public Task<bool> IsProductFoundByProductNameAsync(string productName, CancellationToken ct)
+    {
+        return _products.AnyAsync(
+            predicate: product => product.ProductName.Equals(productName),
+            cancellationToken: ct
+        );
+    }
+
+    public Task<bool> IsProductFoundByProductIdAsync(int productId, CancellationToken ct)
+    {
+        return _products.AnyAsync(
+            predicate: product => product.ProductId == productId,
+            cancellationToken: ct
+        );
+    }
+
+    public async Task<bool> RemoveProductAsync(int productId, CancellationToken ct)
+    {
+        var dbResult = true;
+
+        await _context
+            .Database.CreateExecutionStrategy()
+            .ExecuteAsync(operation: async () =>
+            {
+                await using var transaction = await _context.Database.BeginTransactionAsync(
+                    cancellationToken: ct
+                );
+
+                try
+                {
+                    await _products
+                        .Where(predicate: product => product.ProductId == productId)
+                        .ExecuteDeleteAsync(cancellationToken: ct);
+
+                    await transaction.CommitAsync(cancellationToken: ct);
+                }
+                catch
+                {
+                    await transaction.RollbackAsync(cancellationToken: ct);
+
+                    dbResult = false;
+                }
+            });
+
+        return dbResult;
+    }
 }

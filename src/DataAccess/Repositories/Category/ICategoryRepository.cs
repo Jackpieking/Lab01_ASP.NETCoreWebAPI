@@ -1,3 +1,9 @@
-﻿namespace DataAccess.Repositories.Category;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
-public interface ICategoryRepository { }
+namespace DataAccess.Repositories.Category;
+
+public interface ICategoryRepository
+{
+    Task<bool> IsCategoryFoundByCategoryIdAsync(int categoryId, CancellationToken ct);
+}

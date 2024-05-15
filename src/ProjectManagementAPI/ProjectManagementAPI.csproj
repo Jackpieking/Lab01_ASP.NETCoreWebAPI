@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\Product\Incomings\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
   </ItemGroup>
 
