@@ -64,7 +64,7 @@ services.AddSwaggerGen(setupAction: options =>
         info: new()
         {
             Version = "v1",
-            Title = "Application API",
+            Title = "ProjectManagementAPI",
             Description = "An ASP.NET Core Web API for managing product.",
             License = new()
             {
