@@ -15,4 +15,6 @@ public interface IProductRepository
     Task<bool> IsProductFoundByProductIdAsync(int productId, CancellationToken ct);
 
     Task<bool> RemoveProductAsync(int productId, CancellationToken ct);
+
+    Task<bool> UpdateProductAsync(Entities.Product updatedProduct, CancellationToken ct);
 }

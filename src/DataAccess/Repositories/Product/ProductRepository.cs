@@ -95,4 +95,53 @@ public sealed class ProductRepository : IProductRepository
 
         return dbResult;
     }
+
+    public async Task<bool> UpdateProductAsync(
+        Entities.Product updatedProduct,
+        CancellationToken ct
+    )
+    {
+        var dbResult = true;
+
+        await _context
+            .Database.CreateExecutionStrategy()
+            .ExecuteAsync(operation: async () =>
+            {
+                await using var transaction = await _context.Database.BeginTransactionAsync(
+                    cancellationToken: ct
+                );
+
+                try
+                {
+                    await _products
+                        .Where(product => product.ProductId == updatedProduct.ProductId)
+                        .ExecuteUpdateAsync(builder =>
+                            builder
+                                .SetProperty(
+                                    product => product.ProductName,
+                                    updatedProduct.ProductName
+                                )
+                                .SetProperty(product => product.UnitPrice, updatedProduct.UnitPrice)
+                                .SetProperty(
+                                    product => product.UnitsInStock,
+                                    updatedProduct.UnitsInStock
+                                )
+                                .SetProperty(
+                                    product => product.CategoryId,
+                                    updatedProduct.CategoryId
+                                )
+                        );
+
+                    await transaction.CommitAsync(cancellationToken: ct);
+                }
+                catch
+                {
+                    await transaction.RollbackAsync(cancellationToken: ct);
+
+                    dbResult = false;
+                }
+            });
+
+        return dbResult;
+    }
 }

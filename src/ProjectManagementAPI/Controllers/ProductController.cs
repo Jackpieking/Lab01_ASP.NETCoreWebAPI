@@ -27,6 +27,9 @@ public sealed class ProductController : ControllerBase
     /// <summary>
     ///     Get all products.
     /// </summary>
+    /// <param name="ct">
+    ///     A token to stop the current operation.
+    /// </param>
     /// <returns>
     ///     A list of all product.
     /// </returns>
@@ -57,6 +60,12 @@ public sealed class ProductController : ControllerBase
     /// <summary>
     ///     Create new product.
     /// </summary>
+    /// <param name="dto">
+    ///     Create product dto.
+    /// </param>
+    /// <param name="ct">
+    ///     A token to stop the current operation.
+    /// </param>
     /// <returns>
     ///     Http code.
     /// </returns>
@@ -112,7 +121,7 @@ public sealed class ProductController : ControllerBase
 
         if (!dbResult)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError);
         }
 
         return Ok();
@@ -129,6 +138,27 @@ public sealed class ProductController : ControllerBase
         }
     }
 
+    /// <summary>
+    ///     Delete a product.
+    /// </summary>
+    /// <param name="productId">
+    ///     Id of deleted product.
+    /// </param>
+    /// <param name="ct">
+    ///     A token to stop the current operation.
+    /// </param>
+    /// <returns>
+    ///     Http code.
+    /// </returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     DELETE /api/product/{productId:int}
+    ///
+    /// </remarks>
+    /// <response code="200">Success.</response>
+    /// <response code="404">Not found.</response>
+    /// <response code="500">Server error.</response>
     [HttpDelete(template: "{productId:int}")]
     public async Task<IActionResult> DeleteProductAsync(
         [FromRoute] [Required] [Range(minimum: default, maximum: int.MaxValue)] int productId,
@@ -154,9 +184,107 @@ public sealed class ProductController : ControllerBase
 
         if (!dbResult)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError);
         }
 
         return Ok();
+    }
+
+    /// <summary>
+    ///     Update a product.
+    /// </summary>
+    /// <param name="productId">
+    ///     Id of updated product.
+    /// </param>
+    /// <param name="dto">
+    ///     Update product dto.
+    /// </param>
+    /// <param name="ct">
+    ///     A token to stop the current operation.
+    /// </param>
+    /// <returns>
+    ///     Http code.
+    /// </returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     PUT /api/product/{productId:int}
+    ///     {
+    ///         "productName": "string",
+    ///         "categoryId": int,
+    ///         "unitPrice": decimal,
+    ///         "unitsInStock": int
+    ///     }
+    ///
+    /// </remarks>
+    /// <response code="200">Success.</response>
+    /// <response code="404">Not found.</response>
+    /// <response code="409">Confl  ict.</response>
+    /// <response code="500">Server error.</response>
+    [HttpPut(template: "{productId:int}")]
+    public async Task<IActionResult> UpdateProductAsync(
+        [FromRoute] [Required] [Range(minimum: default, maximum: int.MaxValue)] int productId,
+        [FromBody] UpdateProductDto dto,
+        CancellationToken ct
+    )
+    {
+        // Is product found by product id.
+        var isProductFound = await _unitOfWork.ProductRepository.IsProductFoundByProductIdAsync(
+            productId: productId,
+            ct: ct
+        );
+
+        if (!isProductFound)
+        {
+            return NotFound(value: $"Product is not found by product Id [{productId}] !!");
+        }
+
+        // Is category found by category id.
+        var isCategoryFound = await _unitOfWork.CategoryRepository.IsCategoryFoundByCategoryIdAsync(
+            categoryId: dto.CategoryId,
+            ct: ct
+        );
+
+        if (!isCategoryFound)
+        {
+            return NotFound(value: $"Category with id = {dto.CategoryId} is not found !!");
+        }
+
+        // Is product name found by product name.
+        var isProductNameFound =
+            await _unitOfWork.ProductRepository.IsProductFoundByProductNameAsync(
+                productName: dto.ProductName,
+                ct: ct
+            );
+
+        if (isProductNameFound)
+        {
+            return Conflict(error: $"Product with name = {dto.ProductName} already exists !!");
+        }
+
+        // Update product.
+        var dbResult = await _unitOfWork.ProductRepository.UpdateProductAsync(
+            updatedProduct: InitUpdatedProduct(),
+            ct: ct
+        );
+
+        if (!dbResult)
+        {
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError);
+        }
+
+        return Ok();
+
+        Product InitUpdatedProduct()
+        {
+            return new()
+            {
+                ProductId = productId,
+                ProductName = dto.ProductName,
+                CategoryId = dto.CategoryId,
+                UnitPrice = dto.UnitPrice,
+                UnitsInStock = dto.UnitsInStock
+            };
+        }
     }
 }
